@@ -37,7 +37,7 @@ moves.textContent = "Moves: 0";
 
 const pairs = document.createElement("p");
 pairs.classList.add("pairs-counter");
-pairs.textContent = "Pairs: 0 / 8";
+pairs.textContent = `Pairs: 0 / 8`;
 
 const gameBoard = document.createElement("div");
 gameBoard.classList.add("game-board");
@@ -70,7 +70,7 @@ for (let i = 0; i < cardsData.length; i++) {
 }
 
 function shuffleDeck(deck) {
-  let shuffledDeck = [...deck];
+  const shuffledDeck = [...deck];
   for (let i = shuffledDeck.length - 1; i > 0; i--) {
     const randomIndex = Math.floor(Math.random() * (i + 1));
     const firstElement = shuffledDeck[i];
@@ -84,30 +84,9 @@ function shuffleDeck(deck) {
 
 const readyDeck = shuffleDeck(deck);
 
-for (const card of readyDeck) {
-  const cardButton = document.createElement("button");
-  cardButton.type = "button";
-  cardButton.classList.add("game-card");
-  cardButton.dataset.pairId = card.pairId;
-  cardButton.dataset.cardId = card.cardId;
-
-  const cardBack = document.createElement("div");
-  cardBack.classList.add("card-back");
-
-  const cardFront = document.createElement("div");
-  cardFront.classList.add("card-front");
-
-  const cardImage = document.createElement("img");
-  cardImage.classList.add("card-image");
-  cardImage.src = card.image;
-  cardImage.alt = card.name;
-
-  cardFront.append(cardImage);
-  cardButton.append(cardBack, cardFront);
-  gameBoard.append(cardButton);
-}
 let firstCard = null;
 let secondCard = null;
+let timeoutId = null;
 
 let isLocked = false;
 let isGameOver = false;
@@ -157,12 +136,65 @@ gameBoard.addEventListener("click", function (event) {
     }
   } else {
     console.log("no match");
-    setTimeout(function () {
+    timeoutId = setTimeout(function () {
       firstCard.classList.remove("is-flipped");
       secondCard.classList.remove("is-flipped");
       firstCard = null;
       secondCard = null;
       isLocked = false;
+      timeoutId = null;
     }, 1000);
   }
+});
+
+function renderCards(cards) {
+  for (const card of cards) {
+    const cardButton = document.createElement("button");
+    cardButton.type = "button";
+    cardButton.classList.add("game-card");
+    cardButton.dataset.pairId = card.pairId;
+    cardButton.dataset.cardId = card.cardId;
+
+    const cardBack = document.createElement("div");
+    cardBack.classList.add("card-back");
+
+    const cardFront = document.createElement("div");
+    cardFront.classList.add("card-front");
+
+    const cardImage = document.createElement("img");
+    cardImage.classList.add("card-image");
+    cardImage.src = card.image;
+    cardImage.alt = card.name;
+
+    cardFront.append(cardImage);
+    cardButton.append(cardBack, cardFront);
+    gameBoard.append(cardButton);
+  }
+}
+
+renderCards(readyDeck);
+
+function resetGameState() {
+  if (timeoutId !== null) {
+    clearTimeout(timeoutId);
+    timeoutId = null;
+  }
+  firstCard = null;
+  secondCard = null;
+
+  isLocked = false;
+  isGameOver = false;
+
+  movesCount = 0;
+  matchedPairsCount = 0;
+
+  moves.textContent = "Moves: 0";
+  pairs.textContent = `Pairs: 0 / 8`;
+}
+
+newGameButton.addEventListener("click", function (event) {
+  resetGameState();
+  gameBoard.replaceChildren();
+  const x = shuffleDeck(deck);
+  renderCards(x);
 });
