@@ -132,7 +132,7 @@ gameBoard.addEventListener("click", function (event) {
     isLocked = false;
     if (matchedPairsCount === cardsData.length) {
       isGameOver = true;
-      console.log("You win!");
+      showVictoryModal();
     }
   } else {
     console.log("no match");
