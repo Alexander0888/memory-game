@@ -191,10 +191,74 @@ function resetGameState() {
   moves.textContent = "Moves: 0";
   pairs.textContent = `Pairs: 0 / 8`;
 }
+newGameButton.addEventListener("click", function () {
+  startNewGame();
+});
 
-newGameButton.addEventListener("click", function (event) {
+function startNewGame() {
   resetGameState();
   gameBoard.replaceChildren();
   const x = shuffleDeck(deck);
   renderCards(x);
+}
+
+const modalOverlay = document.createElement("div");
+modalOverlay.classList.add("modal-overlay");
+
+const modal = document.createElement("div");
+modal.classList.add("modal");
+
+const modalContent = document.createElement("div");
+modalContent.classList.add("modal-content");
+
+modal.append(modalContent);
+modalOverlay.append(modal);
+
+function openModal() {
+  document.body.append(modalOverlay);
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  modalOverlay.remove();
+  document.body.style.overflow = "";
+}
+
+modalOverlay.addEventListener("click", function (event) {
+  if (event.target === event.currentTarget) {
+    closeModal();
+  }
 });
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape" && modalOverlay.isConnected) {
+    closeModal();
+  }
+});
+
+function showVictoryModal() {
+  modalContent.replaceChildren();
+  const h2 = document.createElement("h2");
+  h2.textContent = "You win!";
+  const p = document.createElement("p");
+  p.textContent = `Moves: ${movesCount}`;
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.textContent = "Close";
+
+  const newGameModalButton = document.createElement("button");
+  newGameModalButton.type = "button";
+  newGameModalButton.textContent = "New Game";
+
+  modalContent.append(h2, p, closeButton, newGameModalButton);
+  openModal();
+
+  closeButton.addEventListener("click", function (event) {
+    closeModal();
+  });
+
+  newGameModalButton.addEventListener("click", function (event) {
+    closeModal();
+    startNewGame();
+  });
+}
